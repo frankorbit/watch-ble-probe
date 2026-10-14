@@ -1,0 +1,99 @@
+name: WatchBLEProbe
+options:
+  deploymentTarget:
+    watchOS: '11.0'
+    macOS: '14.0'
+    iOS: '17.0'
+settings:
+  base:
+    SWIFT_VERSION: '6.0'
+    CODE_SIGN_STYLE: Automatic
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: '0.1'
+targets:
+  WatchBLEProbe:
+    type: application
+    platform: watchOS
+    sources: [Shared, Watch]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.frank.watchbleprobe.watch
+        SWIFT_OBJC_BRIDGING_HEADER: Watch/ProbeBridge.h
+        TARGETED_DEVICE_FAMILY: 4
+    info:
+      path: Config/Watch-Info.plist
+      properties:
+        CFBundleDisplayName: BLE Probe
+        WKApplication: true
+        WKWatchOnly: true
+        NSBluetoothAlwaysUsageDescription: 验证这块手表能否发布普通 BLE GATT 服务，仅与探针验证端交换测试数据。
+        UILaunchScreen: {}
+  MacBLEVerifier:
+    type: application
+    platform: macOS
+    sources: [Shared, Host, Mac]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.frank.watchbleprobe.mac
+        ENABLE_APP_SANDBOX: NO
+        CODE_SIGN_IDENTITY: '-'
+    info:
+      path: Config/Mac-Info.plist
+      properties:
+        CFBundleDisplayName: BLE Verifier
+        NSBluetoothAlwaysUsageDescription: 发现并验证 Watch BLE 探针的普通 GATT 读写和通知。
+        NSPrincipalClass: NSApplication
+  PhoneGATTHelper:
+    type: application
+    platform: iOS
+    sources: [Shared, Host, iPhone]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.frank.watchbleprobe.iphone
+        TARGETED_DEVICE_FAMILY: '1,2'
+    info:
+      path: Config/Phone-Info.plist
+      properties:
+        CFBundleDisplayName: GATT Helper
+        NSBluetoothAlwaysUsageDescription: 连接自己的 Watch 探针并读取 HID 属性，定位蓝牙输入问题。
+        UILaunchScreen: {}
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+  PhoneHIDSetup:
+    type: application
+    platform: iOS
+    deploymentTarget: '18.4'
+    sources: [Shared, iPhoneSetup]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.frank.watchbleprobe.setup
+        TARGETED_DEVICE_FAMILY: '1,2'
+    info:
+      path: Config/Setup-Info.plist
+      properties:
+        CFBundleDisplayName: HID Setup
+        UILaunchScreen: {}
+        NSAccessorySetupKitSupports: [Bluetooth]
+        NSAccessorySetupBluetoothServices: ['F753D410-8753-43CF-A613-19C364B377B0']
+        NSAccessorySetupBluetoothNames: [WBLEMouse]
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+schemes:
+  WatchBLEProbe:
+    build:
+      targets:
+        WatchBLEProbe: all
+  MacBLEVerifier:
+    build:
+      targets:
+        MacBLEVerifier: all
+  PhoneGATTHelper:
+    build:
+      targets:
+        PhoneGATTHelper: all
+  PhoneHIDSetup:
+    build:
+      targets:
+        PhoneHIDSetup: all
